@@ -2,10 +2,10 @@ import { readdir } from 'node:fs/promises';
 import { type ScheduleOptions, schedule } from 'node-cron';
 
 export type Task = {
-	name: string;
-	cronExpression: string;
-	handler: () => void;
-	scheduleOptions?: ScheduleOptions;
+	readonly name: string;
+	readonly cronExpression: string;
+	readonly handler: () => void;
+	readonly scheduleOptions?: ScheduleOptions;
 };
 
 export async function scheduleTasks(): Promise<void> {
