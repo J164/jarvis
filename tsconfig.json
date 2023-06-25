@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "exactOptionalPropertyTypes": true,
     "strict": true,
     "module": "NodeNext",
     "resolveJsonModule": true,

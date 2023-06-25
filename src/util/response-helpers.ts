@@ -2,15 +2,11 @@ import {
 	type Message,
 	type APIEmbed,
 	type BaseMessageOptions,
-	EmbedField,
 	type APIEmbedField,
-	Interaction,
 	type TextBasedChannel,
-	ChatInputApplicationCommandData,
 	type ChatInputCommandInteraction,
 	ComponentType,
 	ButtonStyle,
-	Base,
 } from 'discord.js';
 import { globalLogger } from './logger.js';
 
@@ -113,6 +109,7 @@ type Destination =
 
 type PaginatedMessageOptions = BaseMessageOptions & {
 	embeds: NonNullable<BaseMessageOptions['embeds']>;
+	/** TODO: assert that the last component is a pagination component */
 	components: NonNullable<BaseMessageOptions['components']>[0];
 };
 
@@ -228,9 +225,8 @@ async function startPagination(destination: Destination, message: Message, optio
 		}
 	}
 
-	const paginationComponent = options.components.at(-1)?.components;
-
-	paginationComponent[0].disabled = 
+	// TODO: edit which components are disabled and send the message
+	const paginationComponent = options.components.at(-1);
 }
 
 type AwaitMessageComponentOptions = Parameters<Message['awaitMessageComponent']>[0];
