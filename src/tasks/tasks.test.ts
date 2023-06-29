@@ -15,8 +15,15 @@ const tasks = await Promise.all(
 		}),
 );
 
-describe.each(tasks)('well-formedness of task $scheduleOptions.name', ({ cronExpression }) => {
+const taskNames = new Set<string>();
+
+describe.each(tasks)('well-formedness of task $scheduleOptions.name', ({ cronExpression, scheduleOptions: { name } }) => {
 	it('should have a valid cron expression', () => {
 		expect(validate(cronExpression)).toBe(true);
+	});
+
+	it('should have a unique name', () => {
+		expect(!taskNames.has(name)).toBe(true);
+		taskNames.add(name);
 	});
 });

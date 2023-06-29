@@ -21,8 +21,8 @@ export const enum Destinations {
 }
 
 type Destination =
-	| { type: Destinations.InteractionEditReply; interaction: ChatInputCommandInteraction }
-	| { type: Destinations.TextChannelSend; channel: TextBasedChannel };
+	| { readonly type: Destinations.InteractionEditReply; readonly interaction: ChatInputCommandInteraction }
+	| { readonly type: Destinations.TextChannelSend; readonly channel: TextBasedChannel };
 
 type PaginationComponent = {
 	type: ComponentType.ActionRow;
