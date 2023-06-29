@@ -15,7 +15,7 @@ const tasks = await Promise.all(
 		}),
 );
 
-describe.each(tasks)('well-formedness of task "$name"', ({ cronExpression }) => {
+describe.each(tasks)('well-formedness of task $scheduleOptions.name', ({ cronExpression }) => {
 	it('should have a valid cron expression', () => {
 		expect(validate(cronExpression)).toBe(true);
 	});

@@ -15,7 +15,7 @@ const logger = globalLogger.child({
 	name: 'message-component-helpers',
 });
 
-const enum Destinations {
+export const enum Destinations {
 	InteractionEditReply,
 	TextChannelSend,
 }
@@ -75,7 +75,7 @@ type PaginatedMessageOptions = Omit<BaseMessageOptions, 'embeds' | 'components'>
 	components: [...NonNullable<BaseMessageOptions['components']>, PaginationComponent];
 };
 
-export async function sendPaginatedMessage(destination: Destination, embed: APIEmbed, options: BaseMessageOptions): Promise<void> {
+export async function sendPaginatedMessage(destination: Destination, embed: APIEmbed, options: BaseMessageOptions = {}): Promise<void> {
 	options.embeds ??= [];
 	options.embeds.push(embed);
 
