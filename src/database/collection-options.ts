@@ -1,34 +1,50 @@
-import { type CreateCollectionOptions, type CollectionOptions } from 'mongodb';
+import { type CreateCollectionOptions, type CollectionOptions, type IndexDescription } from 'mongodb';
+import { type Collections } from './database.js';
 
-export const BIRTHDAY_OPTIONS = {
-	promoteLongs: false,
-	promoteValues: false,
-	promoteBuffers: false,
-} satisfies CollectionOptions;
+type Options = Record<
+	keyof Collections,
+	{
+		baseOptions: CollectionOptions;
+		createOptions: CreateCollectionOptions;
+		indexOptions: IndexDescription[];
+	}
+>;
 
-export const CREATE_BIRTHDAY = {
-	promoteLongs: false,
-	promoteValues: false,
-	promoteBuffers: false,
-	clusteredIndex: {
-		key: { _date: 1 },
-		unique: true,
-	},
-	validator: {
-		$jsonSchema: {
-			bsonType: 'object',
-			required: ['_date', 'name', 'date'],
-			additionalProperties: false,
-			properties: {
-				_date: {
-					bsonType: 'long',
-					description: "required 64-bit integer representing milliseconds from UNIX epoch of the person's birthday",
-				},
-				name: {
-					bsonType: 'string',
-					description: "required string representing the person's name",
+export const COLLECTION_OPTIONS = {
+	birthdays: {
+		baseOptions: {
+			promoteLongs: false,
+			promoteValues: false,
+			promoteBuffers: false,
+		},
+		createOptions: {
+			promoteLongs: false,
+			promoteValues: false,
+			promoteBuffers: false,
+			validator: {
+				$jsonSchema: {
+					bsonType: 'object',
+					required: ['_date', 'name'],
+					additionalProperties: false,
+					properties: {
+						_date: {
+							bsonType: 'int',
+							description: "required 32-bit integer representing the person's birthday in the format MMDD",
+						},
+						name: {
+							bsonType: 'string',
+							description: "required string representing the person's name",
+						},
+					},
 				},
 			},
 		},
+		indexOptions: [
+			{
+				key: {
+					_date: 1,
+				},
+			},
+		],
 	},
-} satisfies CreateCollectionOptions & typeof BIRTHDAY_OPTIONS;
+} satisfies Options;

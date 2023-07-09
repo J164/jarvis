@@ -1,29 +1,47 @@
 import { env } from 'node:process';
-import { type Collection, MongoClient } from 'mongodb';
-import { globalLogger } from '../util/logger.js';
+import { type Collection, MongoClient, type CreateCollectionOptions, type IndexDescription, type Document, type Db } from 'mongodb';
 import { type Birthday } from '../tasks/birthdays.js';
-import { BIRTHDAY_OPTIONS, CREATE_BIRTHDAY } from './collection-options.js';
+import { COLLECTION_OPTIONS } from './collection-options.js';
 
-export const databaseLogger = globalLogger.child({
-	name: 'database',
-});
+export type Collections = {
+	birthdays?: Collection<Birthday>;
+};
 
-const databaseClient = new MongoClient(env.MONGO_URL ?? '');
-await databaseClient.connect();
+let collectionNames: string[];
+let database: Db;
+const collections: Collections = {};
 
-const database = databaseClient.db(env.DATABASE_NAME);
-
-export const [birthdayCollection] = await fetchCollections();
-
-async function fetchCollections(): Promise<[Collection<Birthday>]> {
-	const collectionList = await database.collections();
-	const collections = new Set<string>();
-
-	for (const collection of collectionList) {
-		collections.add(collection.collectionName);
+export async function fetchCollection<T extends keyof Collections>(name: T): Promise<NonNullable<Collections[T]>> {
+	if (!database) {
+		const databaseClient = new MongoClient(env.MONGO_URL ?? '');
+		await databaseClient.connect();
+		database = databaseClient.db(env.DATABASE_NAME);
 	}
 
-	return Promise.all([
-		collections.has('birthday') ? database.collection('birthday', BIRTHDAY_OPTIONS) : await database.createCollection<Birthday>('birthday', CREATE_BIRTHDAY),
-	]);
+	collectionNames ??= await database
+		.listCollections()
+		.map((info) => {
+			return info.name;
+		})
+		.toArray();
+
+	const { baseOptions, createOptions, indexOptions } = COLLECTION_OPTIONS.birthdays;
+
+	return (collections[name] ??= collectionNames.includes(name)
+		? database.collection(name, baseOptions)
+		: await createCollection<Birthday>(name, createOptions, indexOptions));
+}
+
+async function createCollection<T extends Document>(
+	name: string,
+	createOptions: CreateCollectionOptions,
+	indexOptions: IndexDescription[],
+): Promise<Collection<T>> {
+	const collection = await database.createCollection<T>(name, createOptions);
+
+	if (indexOptions.length > 0) {
+		await collection.createIndexes(indexOptions);
+	}
+
+	return collection;
 }
