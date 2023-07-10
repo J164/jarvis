@@ -7,6 +7,11 @@ export type Collections = {
 	birthdays?: Collection<Birthday>;
 };
 
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+interface DocumentTypes extends Record<keyof Collections, Document> {
+	birthdays: Birthday;
+}
+
 let collectionNames: string[];
 let database: Db;
 const collections: Collections = {};
@@ -29,7 +34,7 @@ export async function fetchCollection<T extends keyof Collections>(name: T): Pro
 
 	return (collections[name] ??= collectionNames.includes(name)
 		? database.collection(name, baseOptions)
-		: await createCollection<Birthday>(name, createOptions, indexOptions));
+		: await createCollection<DocumentTypes[T]>(name, createOptions, indexOptions));
 }
 
 async function createCollection<T extends Document>(

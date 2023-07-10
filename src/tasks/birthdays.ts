@@ -1,4 +1,4 @@
-import { Int32 } from 'mongodb';
+import { Int32, type Document } from 'mongodb';
 import { type DMChannel } from 'discord.js';
 import { type Task } from '../util/schedule-tasks.js';
 import { EmbedType, responseEmbed } from '../util/response-helpers.js';
@@ -7,7 +7,7 @@ import { fetchCollection } from '../database/database.js';
 export type Birthday = {
 	_date: Int32;
 	name: string;
-};
+} & Document;
 
 const WEEK = 1000 * 60 * 60 * 24 * 7;
 
