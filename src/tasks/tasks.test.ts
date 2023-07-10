@@ -23,7 +23,7 @@ describe.each(tasks)('well-formedness of task $scheduleOptions.name', ({ cronExp
 	});
 
 	it('should have a unique name', () => {
-		expect(!taskNames.has(name)).toBe(true);
+		expect(taskNames.has(name)).toBe(false);
 		taskNames.add(name);
 	});
 });
