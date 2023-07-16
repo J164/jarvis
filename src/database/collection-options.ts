@@ -26,14 +26,14 @@ export const COLLECTION_OPTIONS = {
 			validator: {
 				$jsonSchema: {
 					bsonType: 'object',
-					required: ['_date', 'name'],
+					required: ['_date', '_name'],
 					additionalProperties: false,
 					properties: {
 						_date: {
 							bsonType: 'int',
 							description: "required 32-bit integer representing the person's birthday in the format MMDD",
 						},
-						name: {
+						_name: {
 							bsonType: 'string',
 							description: "required string representing the person's name",
 						},
@@ -46,6 +46,12 @@ export const COLLECTION_OPTIONS = {
 				key: {
 					_date: 1,
 				},
+			},
+			{
+				key: {
+					_name: 1,
+				},
+				unique: true,
 			},
 		],
 	},

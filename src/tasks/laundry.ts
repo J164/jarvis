@@ -1,4 +1,5 @@
 import { env } from 'node:process';
+import { setTimeout } from 'node:timers/promises';
 import { type Task } from '../util/schedule-tasks.js';
 import { globalLogger } from '../util/logger.js';
 import { EmbedType, responseOptions } from '../util/response-helpers.js';
@@ -18,8 +19,8 @@ type Laundry = {
 export const task: Task = {
 	cronExpression: '',
 	scheduleOptions: { name: 'laundry' },
-	async handler(target) {
-		const dm = await target.createDM();
+	async handler() {
+		const dm = await this.target.createDM();
 
 		const req = await fetch(
 			`https://www.laundryview.com/api/currentRoomData?school_desc_key=${env.LAUNDRY_SCHOOL ?? ''}&location=${env.LAUNDRY_LOCATION ?? ''}&rdm=${Date.now()}`,
@@ -38,8 +39,10 @@ export const task: Task = {
 			})
 		) {
 			await dm.send(responseOptions(EmbedType.Info, 'A washer is available!'));
-		}
 
-		// TODO: add helper methods to parameters for pausing task scheduling
+			this.task.stop();
+			await setTimeout(900_000);
+			this.task.start();
+		}
 	},
 };

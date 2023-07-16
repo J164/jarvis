@@ -6,7 +6,7 @@ import { fetchCollection } from '../database/database.js';
 
 export type Birthday = {
 	_date: Int32;
-	name: string;
+	_name: string;
 } & Document;
 
 const WEEK = 1000 * 60 * 60 * 24 * 7;
@@ -14,8 +14,8 @@ const WEEK = 1000 * 60 * 60 * 24 * 7;
 export const task: Task = {
 	cronExpression: '0 13 * * *',
 	scheduleOptions: { name: 'birthdays' },
-	async handler(target) {
-		const dm = await target.createDM();
+	async handler() {
+		const dm = await this.target.createDM();
 
 		await Promise.all([remindBirthdays(dm, 0), remindBirthdays(dm, 1), remindBirthdays(dm, 2)]);
 	},
@@ -31,8 +31,8 @@ async function remindBirthdays(dm: DMChannel, offsetWeeks: number): Promise<void
 
 	await dm.send({
 		embeds: await cursor
-			.map(({ name }) => {
-				return responseEmbed(EmbedType.Info, `${name}'s birthday is ${offsetWeeks === 0 ? 'today' : `in ${offsetWeeks} weeks on ${month + 1}/${date}`}!`);
+			.map(({ _name }) => {
+				return responseEmbed(EmbedType.Info, `${_name}'s birthday is ${offsetWeeks === 0 ? 'today' : `in ${offsetWeeks} weeks on ${month + 1}/${date}`}!`);
 			})
 			.toArray(),
 	});
