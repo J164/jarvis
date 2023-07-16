@@ -17,17 +17,29 @@ const commands = await Promise.all(
 
 const applicationCommandNames = new Set<string>();
 
-describe.each(commands)('well-formedness of application command $name', ({ name }) => {
+describe.each(commands)('well-formedness of application command $name', (command) => {
 	it('should have a unique name', () => {
-		expect(applicationCommandNames.has(name)).toBe(false);
-		applicationCommandNames.add(name);
+		expect(applicationCommandNames.has(command.name)).toBe(false);
+		applicationCommandNames.add(command.name);
 	});
 
 	it('should match an application command in the deploy script', () => {
 		expect(
 			APPLICATION_COMMANDS.some(({ name: deployName }) => {
-				return deployName === name;
+				return deployName === command.name;
 			}),
 		).toBe(true);
+	});
+
+	it('should have an autocomplete function if autocomplete is enabled in the deploy script', () => {
+		if (
+			APPLICATION_COMMANDS.find(({ name: deployname }) => {
+				return deployname === command.name;
+			})?.options?.some((option) => {
+				return option?.autocomplete;
+			})
+		) {
+			expect(command.autocomplete).toBeDefined();
+		}
 	});
 });
