@@ -1,11 +1,13 @@
 import { type CreateCollectionOptions, type CollectionOptions, type IndexDescription } from 'mongodb';
 import { type Collections } from './database.js';
 
+type UnpromotedCollectionOptions = { promoteLongs: false; promoteValues: false; promoteBuffers: false };
+
 type Options = Record<
 	keyof Collections,
 	{
-		baseOptions: CollectionOptions;
-		createOptions: CreateCollectionOptions;
+		baseOptions: CollectionOptions & UnpromotedCollectionOptions;
+		createOptions: CreateCollectionOptions & UnpromotedCollectionOptions;
 		indexOptions: IndexDescription[];
 	}
 >;
