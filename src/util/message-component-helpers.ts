@@ -239,7 +239,6 @@ async function startPagination(message: Message, options: PaginatedMessageOption
 		const offset = index * 25;
 		const newFields = fields.slice(0 + offset, 24 + offset);
 
-		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		options.embeds.at(-1)!.fields = newFields;
 
 		if (selectComponent) {
