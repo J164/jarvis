@@ -84,15 +84,6 @@ export const APPLICATION_COMMANDS = [
 	},
 	{
 		name: 'remove-birthday',
-		description: 'Removes the birthday reminder for the specified user',
-		options: [
-			{
-				name: 'name',
-				description: 'The name associated with the birthday reminder to remove',
-				type: ApplicationCommandOptionType.String,
-				required: true,
-				autocomplete: true,
-			},
-		],
+		description: 'Removes a birthday reminder',
 	},
 ] satisfies ApplicationCommandDataResolvable[];
