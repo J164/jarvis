@@ -17,7 +17,7 @@ type Laundry = {
 };
 
 export const task: Task = {
-	cronExpression: '',
+	cronExpression: '0 0 1 1 1', // TODO: temporary cron expression until task is ready
 	scheduleOptions: { name: 'laundry' },
 	async handler() {
 		const dm = await this.target.createDM();
