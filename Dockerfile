@@ -1,4 +1,4 @@
-FROM --platform=$TARGETPLATFORM node:hydrogen
+FROM --platform=$TARGETPLATFORM node:20.5
 
 ENV NODE_ENV=production
 WORKDIR /app
