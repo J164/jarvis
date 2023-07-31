@@ -25,6 +25,7 @@ export const handler: ChatInputCommandHandler<true> = {
 					})
 					.toArray(),
 			}),
+			{ selectable: true },
 		);
 
 		if (!req) return;

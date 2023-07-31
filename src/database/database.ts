@@ -18,7 +18,7 @@ const collections: Collections = {};
 
 export async function fetchCollection<T extends keyof Collections>(name: T): Promise<NonNullable<Collections[T]>> {
 	if (!database) {
-		const databaseClient = new MongoClient(env.MONGO_URL ?? '');
+		const databaseClient = new MongoClient(env.MONGODB_URL ?? '');
 		await databaseClient.connect();
 		database = databaseClient.db(env.DATABASE_NAME);
 	}

@@ -18,12 +18,12 @@ export type ChatInputCommandHandler<AllowedInDm extends boolean> = {
 };
 
 export async function loadApplicationCommands(): Promise<Record<string, ApplicationCommandHandler>> {
-	const modules = await readdir('./commands');
+	const modules = await readdir('./application-commands');
 	const handlers: Record<string, ApplicationCommandHandler> = {};
 
 	await Promise.all(
 		modules.map(async (file) => {
-			const { handler } = (await import(`./../commands/${file}`)) as { handler: ApplicationCommandHandler };
+			const { handler } = (await import(`./../application-commands/${file}`)) as { handler: ApplicationCommandHandler };
 			handlers[handler.name] = handler;
 		}),
 	);

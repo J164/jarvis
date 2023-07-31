@@ -49,7 +49,6 @@ type PaginationComponent = {
 			custom_id: 'page_close';
 			style: ButtonStyle.Danger;
 			label: 'Close';
-			emoji: { name: Emojis.RedX };
 			disabled: false;
 		},
 		{
@@ -90,23 +89,24 @@ type PaginatedMessageOptions = Omit<BaseMessageOptions, 'embeds' | 'components'>
 export async function sendPaginatedMessage(
 	destination: Destination,
 	embed: APIEmbed,
-	selectable = false,
-	options: BaseMessageOptions = {},
+	options: { selectable?: boolean } = {},
+	messageOptions: BaseMessageOptions = {},
 ): Promise<string[] | undefined> {
-	options.embeds ??= [];
-	options.embeds.push(embed);
+	messageOptions.embeds ??= [];
+	messageOptions.embeds.push(embed);
 
 	const { fields } = embed;
+	const singlePage = !fields || fields.length <= 25;
 
-	if (!fields || fields.length <= 25) {
-		await sendMessage(destination, options);
+	if (singlePage && !options.selectable) {
+		await sendMessage(destination, messageOptions);
 		return;
 	}
 
-	const initialFields = fields.slice(0, 24) ?? [];
+	const initialFields = fields?.slice(0, 24) ?? [];
 	embed.fields = initialFields;
 
-	options.components = [
+	messageOptions.components = [
 		{
 			type: ComponentType.ActionRow,
 			components: [
@@ -116,7 +116,7 @@ export async function sendPaginatedMessage(
 					style: ButtonStyle.Secondary,
 					label: 'Beginning',
 					emoji: { name: Emojis.DoubleArrowLeft },
-					disabled: false,
+					disabled: singlePage,
 				},
 				{
 					type: ComponentType.Button,
@@ -124,14 +124,13 @@ export async function sendPaginatedMessage(
 					style: ButtonStyle.Secondary,
 					label: 'Previous',
 					emoji: { name: Emojis.ArrowLeft },
-					disabled: false,
+					disabled: singlePage,
 				},
 				{
 					type: ComponentType.Button,
 					custom_id: 'page_close',
 					style: ButtonStyle.Danger,
 					label: 'Close',
-					emoji: { name: Emojis.RedX },
 					disabled: false,
 				},
 				{
@@ -140,7 +139,7 @@ export async function sendPaginatedMessage(
 					style: ButtonStyle.Secondary,
 					label: 'Next',
 					emoji: { name: Emojis.ArrowRight },
-					disabled: false,
+					disabled: singlePage,
 				},
 				{
 					type: ComponentType.Button,
@@ -148,14 +147,14 @@ export async function sendPaginatedMessage(
 					style: ButtonStyle.Secondary,
 					label: 'End',
 					emoji: { name: Emojis.DoubleArrowRight },
-					disabled: true,
+					disabled: singlePage,
 				},
 			],
 		} satisfies PaginationComponent,
 	];
 
-	if (selectable) {
-		options.components.push({
+	if (options.selectable) {
+		messageOptions.components.push({
 			type: ComponentType.ActionRow,
 			components: [
 				{
@@ -173,10 +172,10 @@ export async function sendPaginatedMessage(
 		} satisfies SelectComponent);
 	}
 
-	return startPagination(await sendMessage(destination, options), options as PaginatedMessageOptions, fields);
+	return startPagination(await sendMessage(destination, messageOptions), messageOptions as PaginatedMessageOptions, fields);
 }
 
-async function startPagination(message: Message, options: PaginatedMessageOptions, fields: APIEmbedField[]): Promise<string[] | undefined> {
+async function startPagination(message: Message, options: PaginatedMessageOptions, fields?: APIEmbedField[]): Promise<string[] | undefined> {
 	let index = 0;
 
 	while (message.editable) {
@@ -197,7 +196,15 @@ async function startPagination(message: Message, options: PaginatedMessageOption
 		}
 
 		if (interaction?.isStringSelectMenu()) {
+			// eslint-disable-next-line no-await-in-loop
+			await interaction.update({ components: [] });
 			return interaction.values;
+		}
+
+		if (!fields) {
+			// eslint-disable-next-line no-await-in-loop
+			await interaction.update({ components: [] });
+			return;
 		}
 
 		switch (interaction.customId) {
@@ -222,7 +229,9 @@ async function startPagination(message: Message, options: PaginatedMessageOption
 			}
 
 			default: {
-				break;
+				// eslint-disable-next-line no-await-in-loop
+				await interaction.update({ components: [] });
+				return;
 			}
 		}
 
