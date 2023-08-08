@@ -7,11 +7,10 @@ import { EmbedType, responseOptions } from '../util/response-helpers.js';
 import { handler } from './remove-birthday.js';
 
 describe('remove-birthday respond function', () => {
-	let server: MongoMemoryServer;
 	let fetchCollection: CollectionFetcher;
 
 	beforeAll(async () => {
-		server = await MongoMemoryServer.create();
+		const server = await MongoMemoryServer.create();
 		env.MONGODB_URL = server.getUri();
 		env.DATABASE_NAME = 'remove-birthday';
 		const database = await import('../database/database.js');
