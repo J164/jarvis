@@ -1,9 +1,9 @@
 import { readdir } from 'node:fs/promises';
 import { type ScheduleOptions, schedule, type ScheduledTask } from 'node-cron';
 import { type User } from 'discord.js';
-import { fetchCollection } from '../database/database.js';
+import { type CollectionFetcher, fetchCollection } from '../database/database.js';
 
-type HandlerContext = { target: User; task: ScheduledTask; fetchCollection: typeof fetchCollection };
+type HandlerContext = { target: User; task: ScheduledTask; fetchCollection: CollectionFetcher };
 
 export type Task = {
 	readonly cronExpression: string;

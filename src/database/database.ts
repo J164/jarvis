@@ -7,6 +7,8 @@ export type Collections = {
 	birthdays?: Collection<Birthday>;
 };
 
+export type CollectionFetcher = typeof fetchCollection;
+
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 interface DocumentTypes extends Record<keyof Collections, Document> {
 	birthdays: Birthday;
