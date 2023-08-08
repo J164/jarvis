@@ -8,22 +8,26 @@ export const handler: ChatInputCommandHandler<true> = {
 	allowedInDm: true,
 	async respond(response, context) {
 		const collection = await context.fetchCollection('birthdays');
+		const fields = await collection
+			.find()
+			.map(({ _name, _date }) => {
+				const date = _date.toJSON();
+
+				return {
+					name: _name,
+					value: `${Math.floor(date / 100)}/${Math.floor(date % 100)}`,
+				};
+			})
+			.toArray();
+
+		if (fields.length === 0) {
+			await response.interaction.editReply(responseOptions(EmbedType.Error, 'There are no birthday reminders to remove'));
+			return;
+		}
 
 		const req = await sendPaginatedMessage(
 			{ type: DestinationType.InteractionEditReply, interaction: response.interaction },
-			responseEmbed(EmbedType.Prompt, 'Which birthday reminder would you like to remove?', {
-				fields: await collection
-					.find()
-					.map(({ _name, _date }) => {
-						const date = _date.toJSON();
-
-						return {
-							name: _name,
-							value: `${Math.floor(date / 100)}/${Math.floor(date % 100)}`,
-						};
-					})
-					.toArray(),
-			}),
+			responseEmbed(EmbedType.Prompt, 'Select the birthday reminder to remove', { fields }),
 			{ selectable: true },
 		);
 
