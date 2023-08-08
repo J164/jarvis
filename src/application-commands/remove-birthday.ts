@@ -1,4 +1,3 @@
-import { fetchCollection } from '../database/database.js';
 import { type ChatInputCommandHandler } from '../util/load-commands.js';
 import { DestinationType, sendPaginatedMessage } from '../util/message-component-helpers.js';
 import { EmbedType, responseEmbed, responseOptions } from '../util/response-helpers.js';
@@ -7,8 +6,8 @@ export const handler: ChatInputCommandHandler<true> = {
 	name: 'remove-birthday',
 	type: 'chatInputCommand',
 	allowedInDm: true,
-	async respond(response) {
-		const collection = await fetchCollection('birthdays');
+	async respond(response, context) {
+		const collection = await context.fetchCollection('birthdays');
 
 		const req = await sendPaginatedMessage(
 			{ type: DestinationType.InteractionEditReply, interaction: response.interaction },

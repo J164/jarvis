@@ -1,8 +1,7 @@
-import { Int32, type Document } from 'mongodb';
+import { Int32, type Document, type Collection } from 'mongodb';
 import { type DMChannel } from 'discord.js';
 import { type Task } from '../util/schedule-tasks.js';
 import { EmbedType, responseEmbed } from '../util/response-helpers.js';
-import { fetchCollection } from '../database/database.js';
 
 export type Birthday = {
 	_date: Int32;
@@ -16,17 +15,17 @@ export const task: Task = {
 	scheduleOptions: { name: 'birthdays' },
 	async handler() {
 		const dm = await this.target.createDM();
+		const collection = await this.fetchCollection('birthdays');
 
-		await Promise.all([remindBirthdays(dm, 0), remindBirthdays(dm, 1), remindBirthdays(dm, 2)]);
+		await Promise.all([remindBirthdays(dm, collection, 0), remindBirthdays(dm, collection, 1), remindBirthdays(dm, collection, 2)]);
 	},
 };
 
-async function remindBirthdays(dm: DMChannel, offsetWeeks: number): Promise<void> {
+async function remindBirthdays(dm: DMChannel, collection: Collection<Birthday>, offsetWeeks: number): Promise<void> {
 	const time = offsetWeeks === 0 ? new Date() : new Date(Date.now() + offsetWeeks * WEEK);
 	const month = time.getMonth();
 	const date = time.getDate();
 
-	const collection = await fetchCollection('birthdays');
 	const cursor = collection.find({ _date: new Int32(month * 100 + date) });
 
 	await dm.send({

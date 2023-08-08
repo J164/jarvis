@@ -2,6 +2,7 @@ import { type CacheType, type ChatInputCommandInteraction, type Interaction } fr
 import { type ChatInputCommand, loadApplicationCommands } from '../util/load-commands.js';
 import { globalLogger } from '../util/logger.js';
 import { EmbedType, responseOptions } from '../util/response-helpers.js';
+import { fetchCollection } from '../database/database.js';
 
 const logger = globalLogger.child({
 	name: 'interaction-create-event',
@@ -33,6 +34,8 @@ async function handleChatInputCommand(interaction: ChatInputCommandInteraction):
 		options: interaction.options,
 	});
 
+	const context = { logger: interactionLogger, fetchCollection };
+
 	if (!command.allowedInDm) {
 		if (!interaction.inCachedGuild()) {
 			await interaction.editReply(responseOptions(EmbedType.Error, 'This command can only be used in servers!'));
@@ -40,7 +43,7 @@ async function handleChatInputCommand(interaction: ChatInputCommandInteraction):
 		}
 
 		try {
-			await command.respond(interactionResponse as ChatInputCommand<'cached'>, interactionLogger);
+			await command.respond(interactionResponse as ChatInputCommand<'cached'>, context);
 		} catch (error) {
 			await interaction.editReply(responseOptions(EmbedType.Error, 'Something went wrong!'));
 			interactionLogger.error(error, 'Chat Input Command Interaction threw an error');
@@ -50,7 +53,7 @@ async function handleChatInputCommand(interaction: ChatInputCommandInteraction):
 	}
 
 	try {
-		await command.respond(interactionResponse, interactionLogger);
+		await command.respond(interactionResponse, context);
 	} catch (error) {
 		await interaction.editReply(responseOptions(EmbedType.Error, 'Something went wrong!'));
 		interactionLogger.error(error, 'Chat Input Command Interaction threw an error');

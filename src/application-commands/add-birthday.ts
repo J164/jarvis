@@ -1,5 +1,4 @@
 import { Int32 } from 'mongodb';
-import { fetchCollection } from '../database/database.js';
 import { type ChatInputCommandHandler } from '../util/load-commands.js';
 import { EmbedType, responseOptions } from '../util/response-helpers.js';
 
@@ -7,12 +6,12 @@ export const handler: ChatInputCommandHandler<true> = {
 	name: 'add-birthday',
 	type: 'chatInputCommand',
 	allowedInDm: true,
-	async respond(response) {
+	async respond(response, context) {
 		const name = response.interaction.options.getString('name', true);
 		const month = response.interaction.options.getInteger('month', true);
 		const day = response.interaction.options.getInteger('day', true);
 
-		const collection = await fetchCollection('birthdays');
+		const collection = await context.fetchCollection('birthdays');
 
 		const req = await collection.findOne({ _name: name });
 

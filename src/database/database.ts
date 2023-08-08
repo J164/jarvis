@@ -1,5 +1,5 @@
 import { env } from 'node:process';
-import { type Collection, MongoClient, type CreateCollectionOptions, type IndexDescription, type Document, type Db } from 'mongodb';
+import { type Collection, MongoClient, type CreateCollectionOptions, type IndexDescription, type Document } from 'mongodb';
 import { type Birthday } from '../tasks/birthdays.js';
 import { COLLECTION_OPTIONS } from './collection-options.js';
 
@@ -12,24 +12,20 @@ interface DocumentTypes extends Record<keyof Collections, Document> {
 	birthdays: Birthday;
 }
 
-let collectionNames: string[];
-let database: Db;
+const databaseClient = new MongoClient(env.MONGODB_URL ?? '');
+await databaseClient.connect();
+const database = databaseClient.db(env.DATABASE_NAME);
+
+const collectionNames = await database
+	.listCollections()
+	.map((info) => {
+		return info.name;
+	})
+	.toArray();
+
 const collections: Collections = {};
 
 export async function fetchCollection<T extends keyof Collections>(name: T): Promise<NonNullable<Collections[T]>> {
-	if (!database) {
-		const databaseClient = new MongoClient(env.MONGODB_URL ?? '');
-		await databaseClient.connect();
-		database = databaseClient.db(env.DATABASE_NAME);
-	}
-
-	collectionNames ??= await database
-		.listCollections()
-		.map((info) => {
-			return info.name;
-		})
-		.toArray();
-
 	const { baseOptions, createOptions, indexOptions } = COLLECTION_OPTIONS.birthdays;
 
 	return (collections[name] ??= collectionNames.includes(name)
