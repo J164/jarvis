@@ -1,4 +1,4 @@
-import { type CreateCollectionOptions, type CollectionOptions, type IndexDescription } from 'mongodb';
+import { type CreateCollectionOptions, type CollectionOptions, type Document, type IndexDescription } from 'mongodb';
 import { type Collections } from './database.js';
 
 type UnpromotedCollectionOptions = { promoteLongs: false; promoteValues: false; promoteBuffers: false };
@@ -7,7 +7,7 @@ type Options = Record<
 	keyof Collections,
 	{
 		baseOptions: CollectionOptions & UnpromotedCollectionOptions;
-		createOptions: CreateCollectionOptions & UnpromotedCollectionOptions;
+		createOptions: CreateCollectionOptions & UnpromotedCollectionOptions & { validator: Document };
 		indexOptions: IndexDescription[];
 	}
 >;
@@ -26,9 +26,13 @@ export const COLLECTION_OPTIONS = {
 			validator: {
 				$jsonSchema: {
 					bsonType: 'object',
-					required: ['_date', '_name'],
+					required: ['_id', '_date', '_name'],
 					additionalProperties: false,
 					properties: {
+						_id: {
+							bsonType: 'objectId',
+							description: 'required unique id of database entry',
+						},
 						_date: {
 							bsonType: 'int',
 							description: "required 32-bit integer representing the person's birthday in the format MMDD",
