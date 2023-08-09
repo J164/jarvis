@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { env } from 'node:process';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { MongoMemoryServer } from 'mongodb-memory-server';
@@ -40,6 +41,7 @@ describe('remove-birthday respond function', () => {
 									isStringSelectMenu() {
 										return true;
 									},
+									// eslint-disable-next-line @typescript-eslint/no-empty-function
 									update() {},
 									values: ['test'],
 								};
@@ -51,6 +53,7 @@ describe('remove-birthday respond function', () => {
 			{ fetchCollection },
 		);
 
+		// eslint-disable-next-line unicorn/no-null
 		expect(await collection.findOne({ _name: 'test' })).toBe(null);
 	});
 });
