@@ -4,19 +4,16 @@ import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { type InteractionEditReplyOptions } from 'discord.js';
 import { Int32 } from 'mongodb';
-import { type CollectionFetcher } from '../database/database.js';
-import { EmbedType, responseOptions } from '../util/response-helpers.js';
+import { EmbedType, fetchCollection, responseOptions } from '@j164/bot-framework';
+import { BIRTHDAY_COLLECTION } from '../util/collection-options.js';
+import { type Birthday } from '../tasks/birthdays.js';
 import { handler } from './remove-birthday.js';
 
 describe('remove-birthday respond function', () => {
-	let fetchCollection: CollectionFetcher;
-
 	beforeAll(async () => {
 		const server = await MongoMemoryServer.create();
-		env.MONGODB_URL = server.getUri();
+		env.MONGO_URL = server.getUri();
 		env.DATABASE_NAME = 'remove-birthday';
-		const database = await import('../database/database.js');
-		fetchCollection = database.fetchCollection;
 	});
 
 	it('should exit early if there are no birthday reminders to remove', async () => {
@@ -27,7 +24,7 @@ describe('remove-birthday respond function', () => {
 	});
 
 	it('should remove the selected birthday reminder', async () => {
-		const collection = await fetchCollection('birthdays');
+		const collection = await fetchCollection<Birthday>('birthdays', env.MONGO_URL ?? '', BIRTHDAY_COLLECTION);
 		await collection.insertOne({ _name: 'test', _date: new Int32(1110) });
 
 		await handler.respond(

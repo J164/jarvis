@@ -1,6 +1,8 @@
+import { env } from 'node:process';
+import { type ChatInputCommandHandler, EmbedType, responseOptions } from '@j164/bot-framework';
 import { Int32 } from 'mongodb';
-import { type ChatInputCommandHandler } from '../util/load-commands.js';
-import { EmbedType, responseOptions } from '../util/response-helpers.js';
+import { BIRTHDAY_COLLECTION } from '../util/collection-options.js';
+import { type Birthday } from '../tasks/birthdays.js';
 
 export const handler: ChatInputCommandHandler<true> = {
 	name: 'add-birthday',
@@ -11,7 +13,7 @@ export const handler: ChatInputCommandHandler<true> = {
 		const month = response.interaction.options.getInteger('month', true);
 		const day = response.interaction.options.getInteger('day', true);
 
-		const collection = await context.fetchCollection('birthdays');
+		const collection = await context.fetchCollection<Birthday>('birthdays', env.MONGO_URL ?? '', BIRTHDAY_COLLECTION);
 
 		const req = await collection.findOne({ _name: name });
 

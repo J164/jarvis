@@ -1,15 +1,20 @@
 import { env } from 'node:process';
-import { ActivityType, Client, GatewayIntentBits, Partials } from 'discord.js';
-import { onReady } from './event-handlers/ready.js';
-import { onInteractionCreate } from './event-handlers/interaction-create.js';
+import { ActivityType, GatewayIntentBits, Partials } from 'discord.js';
+import { startBot } from '@j164/bot-framework';
+import { loadApplicationCommands } from './util/load-commands.js';
+import { loadTasks } from './util/load-tasks.js';
 
-await new Client({
-	intents: [GatewayIntentBits.Guilds],
-	partials: [Partials.Channel],
-	presence: {
-		activities: [{ name: env.STATUS ?? '', type: ActivityType.Playing }],
+const [commandHandlers, taskHandlers] = await Promise.all([loadApplicationCommands(), loadTasks()]);
+
+await startBot({
+	token: env.TOKEN ?? '',
+	clientOptions: {
+		intents: [GatewayIntentBits.Guilds],
+		partials: [Partials.Channel],
+		presence: {
+			activities: [{ name: env.STATUS ?? '', type: ActivityType.Playing }],
+		},
 	},
-})
-	.once('ready', onReady)
-	.on('interactionCreate', onInteractionCreate)
-	.login(env.TOKEN);
+	commandHandlers,
+	taskHandlers,
+});

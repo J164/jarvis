@@ -1,7 +1,8 @@
+import { env } from 'node:process';
 import { Int32, type Document, type Collection } from 'mongodb';
 import { type DMChannel } from 'discord.js';
-import { type Task } from '../util/schedule-tasks.js';
-import { EmbedType, responseEmbed } from '../util/response-helpers.js';
+import { EmbedType, type Task, responseEmbed } from '@j164/bot-framework';
+import { BIRTHDAY_COLLECTION } from '../util/collection-options.js';
 
 export type Birthday = {
 	_date: Int32;
@@ -14,8 +15,9 @@ export const task: Task = {
 	cronExpression: '0 13 * * *',
 	scheduleOptions: { name: 'birthdays' },
 	async handler() {
-		const dm = await this.target.createDM();
-		const collection = await this.fetchCollection('birthdays');
+		const user = await this.botClient.client.users.fetch(env.USER_ID ?? '');
+		const dm = await user.createDM();
+		const collection = await this.fetchCollection<Birthday>('birthdays', env.MONGO_URL ?? '', BIRTHDAY_COLLECTION);
 
 		await Promise.all([remindBirthdays(dm, collection, 0), remindBirthdays(dm, collection, 1), remindBirthdays(dm, collection, 2)]);
 	},

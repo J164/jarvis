@@ -1,13 +1,14 @@
-import { type ChatInputCommandHandler } from '../util/load-commands.js';
-import { DestinationType, sendPaginatedMessage } from '../util/message-component-helpers.js';
-import { EmbedType, responseEmbed, responseOptions } from '../util/response-helpers.js';
+import { env } from 'node:process';
+import { type ChatInputCommandHandler, responseOptions, sendPaginatedMessage, DestinationType, responseEmbed, EmbedType } from '@j164/bot-framework';
+import { BIRTHDAY_COLLECTION } from '../util/collection-options.js';
+import { type Birthday } from '../tasks/birthdays.js';
 
 export const handler: ChatInputCommandHandler<true> = {
 	name: 'remove-birthday',
 	type: 'chatInputCommand',
 	allowedInDm: true,
 	async respond(response, context) {
-		const collection = await context.fetchCollection('birthdays');
+		const collection = await context.fetchCollection<Birthday>('birthdays', env.MONGO_URL ?? '', BIRTHDAY_COLLECTION);
 		const fields = await collection
 			.find()
 			.map(({ _name, _date }) => {

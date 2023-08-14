@@ -2,10 +2,12 @@ import { env } from 'node:process';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Int32 } from 'mongodb';
-import { COLLECTION_OPTIONS } from './collection-options.js';
-import { type CollectionFetcher } from './database.js';
+import { fetchCollection } from '@j164/bot-framework';
+import { type Birthday } from '../tasks/birthdays.js';
+import * as CollectionOptions from './collection-options.js';
+import { BIRTHDAY_COLLECTION } from './collection-options.js';
 
-describe.each(Object.values(COLLECTION_OPTIONS))('collection creation options', (collection) => {
+describe.each(Object.values(CollectionOptions))('collection creation options', (collection) => {
 	it('should extend its respective collection options', () => {
 		for (const [key, value] of Object.entries(collection.baseOptions)) {
 			expect(collection.createOptions[key]).toEqual(value);
@@ -14,18 +16,14 @@ describe.each(Object.values(COLLECTION_OPTIONS))('collection creation options', 
 });
 
 describe('birthday collection options', () => {
-	let fetchCollection: CollectionFetcher;
-
 	beforeAll(async () => {
 		const server = await MongoMemoryServer.create();
-		env.MONGODB_URL = server.getUri();
+		env.MONGO_URL = server.getUri();
 		env.DATABASE_NAME = 'remove-birthday';
-		const database = await import('../database/database.js');
-		fetchCollection = database.fetchCollection;
 	});
 
 	it('should correctly validate documents', async () => {
-		const collection = await fetchCollection('birthdays');
+		const collection = await fetchCollection<Birthday>('birthdays', env.MONGO_URL ?? '', BIRTHDAY_COLLECTION);
 
 		expect(await collection.insertOne({ _name: 'valid', _date: new Int32(1031) })).toBeDefined();
 
@@ -37,7 +35,7 @@ describe('birthday collection options', () => {
 	});
 
 	it('should not allow duplicate names', async () => {
-		const collection = await fetchCollection('birthdays');
+		const collection = await fetchCollection<Birthday>('birthdays', env.MONGO_URL ?? '', BIRTHDAY_COLLECTION);
 
 		await collection.insertOne({ _name: 'not_unique', _date: new Int32(1111) });
 

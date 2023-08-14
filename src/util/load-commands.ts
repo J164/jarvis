@@ -1,28 +1,9 @@
 import { readdir } from 'node:fs/promises';
-import { type CacheType, type InteractionResponse, type ChatInputCommandInteraction, type AutocompleteInteraction } from 'discord.js';
-import { type Logger } from 'pino';
-import { type CollectionFetcher } from '../database/database.js';
+import { type ApplicationCommandHandler, type ApplicationCommandHandlers } from '@j164/bot-framework';
 
-export type ChatInputCommand<T extends CacheType> = Omit<InteractionResponse, 'interaction'> & {
-	interaction: ChatInputCommandInteraction<T>;
-};
-
-export type ApplicationCommandHandler = ChatInputCommandHandler<boolean>;
-
-type CommandContext = { logger: Logger; fetchCollection: CollectionFetcher };
-
-export type ChatInputCommandHandler<AllowedInDm extends boolean> = {
-	readonly respond: (response: ChatInputCommand<AllowedInDm extends true ? CacheType : 'cached'>, commandContext: CommandContext) => Promise<void>;
-	readonly autocomplete?: (interaction: AutocompleteInteraction<AllowedInDm extends true ? CacheType : 'cached'>, logger: Logger) => Promise<void>;
-	readonly allowedInDm: AllowedInDm;
-	readonly name: string;
-	readonly ephemeral?: boolean;
-	readonly type: 'chatInputCommand';
-};
-
-export async function loadApplicationCommands(): Promise<Record<string, ApplicationCommandHandler>> {
+export async function loadApplicationCommands(): Promise<ApplicationCommandHandlers> {
 	const modules = await readdir('./application-commands');
-	const handlers: Record<string, ApplicationCommandHandler> = {};
+	const handlers: ApplicationCommandHandlers = {};
 
 	await Promise.all(
 		modules.map(async (file) => {

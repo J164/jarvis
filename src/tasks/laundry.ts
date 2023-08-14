@@ -1,12 +1,6 @@
 import { env } from 'node:process';
 import { setTimeout } from 'node:timers/promises';
-import { type Task } from '../util/schedule-tasks.js';
-import { globalLogger } from '../util/logger.js';
-import { EmbedType, responseOptions } from '../util/response-helpers.js';
-
-const logger = globalLogger.child({
-	name: 'laundry-task',
-});
+import { EmbedType, type Task, responseOptions } from '@j164/bot-framework';
 
 // TODO: determine which properties are needed
 type Laundry = {
@@ -20,14 +14,15 @@ export const task: Task = {
 	cronExpression: '0 0 1 1 1', // TODO: temporary cron expression until task is ready
 	scheduleOptions: { name: 'laundry' },
 	async handler() {
-		const dm = await this.target.createDM();
+		const user = await this.botClient.client.users.fetch(env.USER_ID ?? '');
+		const dm = await user.createDM();
 
 		const req = await fetch(
 			`https://www.laundryview.com/api/currentRoomData?school_desc_key=${env.LAUNDRY_SCHOOL ?? ''}&location=${env.LAUNDRY_LOCATION ?? ''}&rdm=${Date.now()}`,
 		);
 
 		if (!req.ok) {
-			logger.error(req.json(), `Fetching laundry info failed with status text: "${req.statusText}"`);
+			this.botClient.globalLogger.error(req.json(), `Fetching laundry info failed with status text: "${req.statusText}"`);
 			return;
 		}
 

@@ -1,6 +1,6 @@
 import { readdir } from 'node:fs/promises';
 import { describe, expect, it } from 'vitest';
-import { type ApplicationCommandHandler } from '../util/load-commands.js';
+import { type ApplicationCommandHandler } from '@j164/bot-framework';
 import { APPLICATION_COMMANDS } from '../../deploy/application-commands.js';
 
 const files = await readdir('./src/application-commands');
