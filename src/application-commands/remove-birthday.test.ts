@@ -1,30 +1,31 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-import { env } from 'node:process';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { type InteractionEditReplyOptions } from 'discord.js';
-import { Int32 } from 'mongodb';
-import { EmbedType, fetchCollection, responseOptions } from '@j164/bot-framework';
+import { Int32, MongoClient } from 'mongodb';
+import { type CollectionFetcher, EmbedType, fetchCollection, responseOptions } from '@j164/bot-framework';
 import { BIRTHDAY_COLLECTION } from '../util/collection-options.js';
-import { type Birthday } from '../tasks/birthdays.js';
 import { handler } from './remove-birthday.js';
 
 describe('remove-birthday respond function', () => {
+	let collectionFetcher: CollectionFetcher;
+
 	beforeAll(async () => {
 		const server = await MongoMemoryServer.create();
-		env.MONGO_URL = server.getUri();
-		env.DATABASE_NAME = 'remove-birthday';
+		const client = new MongoClient(server.getUri());
+		await client.connect();
+		collectionFetcher = fetchCollection.bind({ client, db: client.db('remove-birthday'), collectionNames: [], collections: {} });
 	});
 
 	it('should exit early if there are no birthday reminders to remove', async () => {
 		const editReply = vi.fn<[InteractionEditReplyOptions], unknown>();
 
-		await handler.respond({ interaction: { editReply } }, { fetchCollection });
+		await handler.respond({ interaction: { editReply } }, { botClient: { fetchCollection: collectionFetcher } });
 		expect(editReply.mock.lastCall?.at(0)).toEqual(responseOptions(EmbedType.Error, 'There are no birthday reminders to remove'));
 	});
 
 	it('should remove the selected birthday reminder', async () => {
-		const collection = await fetchCollection<Birthday>('birthdays', env.MONGO_URL ?? '', BIRTHDAY_COLLECTION);
+		const collection = await collectionFetcher('birthdays', BIRTHDAY_COLLECTION);
 		await collection.insertOne({ _name: 'test', _date: new Int32(1110) });
 
 		await handler.respond(
@@ -47,7 +48,7 @@ describe('remove-birthday respond function', () => {
 					},
 				},
 			},
-			{ fetchCollection },
+			{ botClient: { fetchCollection: collectionFetcher } },
 		);
 
 		// eslint-disable-next-line unicorn/no-null

@@ -1,9 +1,7 @@
-import { env } from 'node:process';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import { Int32 } from 'mongodb';
-import { fetchCollection } from '@j164/bot-framework';
-import { type Birthday } from '../tasks/birthdays.js';
+import { Int32, MongoClient } from 'mongodb';
+import { type CollectionFetcher, fetchCollection } from '@j164/bot-framework';
 import * as CollectionOptions from './collection-options.js';
 import { BIRTHDAY_COLLECTION } from './collection-options.js';
 
@@ -16,14 +14,17 @@ describe.each(Object.values(CollectionOptions))('collection creation options', (
 });
 
 describe('birthday collection options', () => {
+	let collectionFetcher: CollectionFetcher;
+
 	beforeAll(async () => {
 		const server = await MongoMemoryServer.create();
-		env.MONGO_URL = server.getUri();
-		env.DATABASE_NAME = 'remove-birthday';
+		const client = new MongoClient(server.getUri());
+		await client.connect();
+		collectionFetcher = fetchCollection.bind({ client, db: client.db('birthday-options'), collectionNames: [], collections: {} });
 	});
 
 	it('should correctly validate documents', async () => {
-		const collection = await fetchCollection<Birthday>('birthdays', env.MONGO_URL ?? '', BIRTHDAY_COLLECTION);
+		const collection = await collectionFetcher('birthdays', BIRTHDAY_COLLECTION);
 
 		expect(await collection.insertOne({ _name: 'valid', _date: new Int32(1031) })).toBeDefined();
 
@@ -35,7 +36,7 @@ describe('birthday collection options', () => {
 	});
 
 	it('should not allow duplicate names', async () => {
-		const collection = await fetchCollection<Birthday>('birthdays', env.MONGO_URL ?? '', BIRTHDAY_COLLECTION);
+		const collection = await collectionFetcher('birthdays', BIRTHDAY_COLLECTION);
 
 		await collection.insertOne({ _name: 'not_unique', _date: new Int32(1111) });
 

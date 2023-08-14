@@ -8,6 +8,7 @@ const [commandHandlers, taskHandlers] = await Promise.all([loadApplicationComman
 
 await startBot({
 	token: env.TOKEN ?? '',
+	databaseUrl: env.MONGO_URL ?? '',
 	clientOptions: {
 		intents: [GatewayIntentBits.Guilds],
 		partials: [Partials.Channel],

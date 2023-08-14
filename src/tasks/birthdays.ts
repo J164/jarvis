@@ -14,10 +14,10 @@ const WEEK = 1000 * 60 * 60 * 24 * 7;
 export const task: Task = {
 	cronExpression: '0 13 * * *',
 	scheduleOptions: { name: 'birthdays' },
-	async handler() {
-		const user = await this.botClient.client.users.fetch(env.USER_ID ?? '');
+	async handler(context) {
+		const user = await context.botClient.client.users.fetch(env.USER_ID ?? '');
 		const dm = await user.createDM();
-		const collection = await this.fetchCollection<Birthday>('birthdays', env.MONGO_URL ?? '', BIRTHDAY_COLLECTION);
+		const collection = await context.botClient.fetchCollection<Birthday>('birthdays', BIRTHDAY_COLLECTION);
 
 		await Promise.all([remindBirthdays(dm, collection, 0), remindBirthdays(dm, collection, 1), remindBirthdays(dm, collection, 2)]);
 	},

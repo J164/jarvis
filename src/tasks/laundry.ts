@@ -13,8 +13,8 @@ type Laundry = {
 export const task: Task = {
 	cronExpression: '0 0 1 1 1', // TODO: temporary cron expression until task is ready
 	scheduleOptions: { name: 'laundry' },
-	async handler() {
-		const user = await this.botClient.client.users.fetch(env.USER_ID ?? '');
+	async handler(context) {
+		const user = await context.botClient.client.users.fetch(env.USER_ID ?? '');
 		const dm = await user.createDM();
 
 		const req = await fetch(
@@ -22,7 +22,7 @@ export const task: Task = {
 		);
 
 		if (!req.ok) {
-			this.botClient.globalLogger.error(req.json(), `Fetching laundry info failed with status text: "${req.statusText}"`);
+			context.taskLogger.error(req.json(), `Fetching laundry info failed with status text: "${req.statusText}"`);
 			return;
 		}
 
@@ -35,9 +35,9 @@ export const task: Task = {
 		) {
 			await dm.send(responseOptions(EmbedType.Info, 'A washer is available!'));
 
-			this.task.stop();
+			context.task.stop();
 			await setTimeout(900_000);
-			this.task.start();
+			context.task.start();
 		}
 	},
 };

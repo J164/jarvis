@@ -1,4 +1,3 @@
-import { env } from 'node:process';
 import { type ChatInputCommandHandler, responseOptions, sendPaginatedMessage, DestinationType, responseEmbed, EmbedType } from '@j164/bot-framework';
 import { BIRTHDAY_COLLECTION } from '../util/collection-options.js';
 import { type Birthday } from '../tasks/birthdays.js';
@@ -8,7 +7,7 @@ export const handler: ChatInputCommandHandler<true> = {
 	type: 'chatInputCommand',
 	allowedInDm: true,
 	async respond(response, context) {
-		const collection = await context.fetchCollection<Birthday>('birthdays', env.MONGO_URL ?? '', BIRTHDAY_COLLECTION);
+		const collection = await context.botClient.fetchCollection<Birthday>('birthdays', BIRTHDAY_COLLECTION);
 		const fields = await collection
 			.find()
 			.map(({ _name, _date }) => {
