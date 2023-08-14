@@ -20,7 +20,7 @@
     "mongodb-memory-server": "8.14.0",
     "typescript": "5.1.6",
     "vitest": "0.34.1",
-    "xo": "0.55.1"
+    "xo": "0.56.0"
   },
   "optionalDependencies": {
     "bufferutil": "4.0.7",
