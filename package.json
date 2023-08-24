@@ -9,7 +9,7 @@
   "dependencies": {
     "@j164/bot-framework": "0.4.2",
     "discord.js": "14.12.1",
-    "mongodb": "5.7.0",
+    "mongodb": "5.8.1",
     "node-cron": "3.0.2",
     "pino": "8.15.0"
   },
