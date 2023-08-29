@@ -1,4 +1,4 @@
-import { type ChatInputCommandHandler, sendPaginatedMessage, DestinationType, responseEmbed, EmbedType } from '@j164/bot-framework';
+import { type ChatInputCommandHandler, sendPaginatedMessage, responseEmbed, EmbedType } from '@j164/bot-framework';
 import { getTasks } from 'node-cron';
 
 export const handler: ChatInputCommandHandler<true> = {
@@ -7,7 +7,9 @@ export const handler: ChatInputCommandHandler<true> = {
 	allowedInDm: true,
 	async respond(response) {
 		await sendPaginatedMessage(
-			{ type: DestinationType.InteractionEditReply, interaction: response.interaction },
+			async (options) => {
+				return response.interaction.editReply(options);
+			},
 			responseEmbed(EmbedType.Info, 'Scheduled Tasks', {
 				fields: [...getTasks().keys()].map((task, index) => {
 					return { name: `${index + 1}.`, value: task };

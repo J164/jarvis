@@ -1,4 +1,4 @@
-import { type ChatInputCommandHandler, responseOptions, sendPaginatedMessage, DestinationType, responseEmbed, EmbedType } from '@j164/bot-framework';
+import { type ChatInputCommandHandler, responseOptions, sendPaginatedMessage, responseEmbed, EmbedType } from '@j164/bot-framework';
 import { BIRTHDAY_COLLECTION } from '../util/collection-options.js';
 import { type Birthday } from '../tasks/birthdays.js';
 
@@ -26,7 +26,9 @@ export const handler: ChatInputCommandHandler<true> = {
 		}
 
 		const req = await sendPaginatedMessage(
-			{ type: DestinationType.InteractionEditReply, interaction: response.interaction },
+			async (options) => {
+				return response.interaction.editReply(options);
+			},
 			responseEmbed(EmbedType.Prompt, 'Select the birthday reminder to remove', { fields }),
 			{ selectable: true },
 		);
