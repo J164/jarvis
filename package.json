@@ -17,7 +17,7 @@
     "@types/node": "20.5.7",
     "@types/node-cron": "3.0.8",
     "@vitest/coverage-v8": "0.34.3",
-    "mongodb-memory-server": "8.15.1",
+    "mongodb-memory-server": "9.1.6",
     "typescript": "5.2.2",
     "vitest": "0.34.3",
     "xo": "0.56.0"
