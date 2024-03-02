@@ -1,5 +1,7 @@
-import { type ChatInputCommandHandler, sendPaginatedMessage, responseEmbed, EmbedType } from '@j164/bot-framework';
 import { getTasks } from 'node-cron';
+import { type ChatInputCommandHandler } from '../bot-client.js';
+import { sendPaginatedMessage } from '../util/message-component-helpers.js';
+import { EmbedType, responseEmbed } from '../util/response-helpers.js';
 
 export const handler: ChatInputCommandHandler<true> = {
 	name: 'tasks',

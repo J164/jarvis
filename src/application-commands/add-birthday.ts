@@ -1,7 +1,8 @@
-import { type ChatInputCommandHandler, EmbedType, responseOptions } from '@j164/bot-framework';
 import { Int32 } from 'mongodb';
 import { BIRTHDAY_COLLECTION } from '../util/collection-options.js';
 import { type Birthday } from '../tasks/birthdays.js';
+import { type ChatInputCommandHandler } from '../bot-client.js';
+import { EmbedType, responseOptions } from '../util/response-helpers.js';
 
 export const handler: ChatInputCommandHandler<true> = {
 	name: 'add-birthday',

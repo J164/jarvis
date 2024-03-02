@@ -1,5 +1,5 @@
 import { readdir } from 'node:fs/promises';
-import { type ApplicationCommandHandler, type ApplicationCommandHandlers } from '@j164/bot-framework';
+import { type ApplicationCommandHandler, type ApplicationCommandHandlers } from '../bot-client.js';
 
 export async function loadApplicationCommands(): Promise<ApplicationCommandHandlers> {
 	const modules = await readdir('./application-commands');

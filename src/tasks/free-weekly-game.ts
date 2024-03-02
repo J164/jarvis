@@ -1,5 +1,6 @@
 import { env } from 'node:process';
-import { EmbedType, type Task, responseOptions } from '@j164/bot-framework';
+import { type Task } from '../bot-client.js';
+import { EmbedType, responseOptions } from '../util/response-helpers.js';
 
 export const task: Task = {
 	cronExpression: '0 15 * * 4',

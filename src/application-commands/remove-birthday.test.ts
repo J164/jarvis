@@ -3,8 +3,10 @@ import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { type InteractionEditReplyOptions } from 'discord.js';
 import { Int32, MongoClient } from 'mongodb';
-import { type CollectionFetcher, EmbedType, fetchCollection, responseOptions } from '@j164/bot-framework';
 import { BIRTHDAY_COLLECTION } from '../util/collection-options.js';
+import { type CollectionFetcher } from '../bot-client.js';
+import { fetchCollection } from '../database.js';
+import { EmbedType, responseOptions } from '../util/response-helpers.js';
 import { handler } from './remove-birthday.js';
 
 describe('remove-birthday respond function', () => {

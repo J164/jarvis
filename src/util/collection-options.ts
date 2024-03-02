@@ -1,4 +1,4 @@
-import { type MongoCollectionOptions } from '@j164/bot-framework';
+import { type MongoCollectionOptions } from '../database.js';
 
 export const BIRTHDAY_COLLECTION = {
 	baseOptions: {

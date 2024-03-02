@@ -1,5 +1,5 @@
 import { readdir } from 'node:fs/promises';
-import { type Task } from '@j164/bot-framework';
+import { type Task } from '../bot-client.js';
 
 export async function loadTasks(): Promise<Task[]> {
 	const tasks = await readdir('./tasks');

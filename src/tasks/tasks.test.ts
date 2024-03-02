@@ -1,7 +1,7 @@
 import { readdir } from 'node:fs/promises';
 import { describe, expect, it } from 'vitest';
 import { validate } from 'node-cron';
-import { type Task } from '@j164/bot-framework';
+import { type Task } from '../bot-client.js';
 
 const files = await readdir('./src/tasks');
 

@@ -1,7 +1,8 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Int32, MongoClient } from 'mongodb';
-import { type CollectionFetcher, fetchCollection } from '@j164/bot-framework';
+import { fetchCollection } from '../database.js';
+import { type CollectionFetcher } from '../bot-client.js';
 import * as CollectionOptions from './collection-options.js';
 import { BIRTHDAY_COLLECTION } from './collection-options.js';
 

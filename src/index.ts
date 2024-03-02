@@ -1,8 +1,8 @@
 import { env } from 'node:process';
 import { ActivityType, GatewayIntentBits, Partials } from 'discord.js';
-import { startBot } from '@j164/bot-framework';
 import { loadApplicationCommands } from './util/load-commands.js';
 import { loadTasks } from './util/load-tasks.js';
+import { startBot } from './bot-client.js';
 
 const [commandHandlers, taskHandlers] = await Promise.all([loadApplicationCommands(), loadTasks()]);
 

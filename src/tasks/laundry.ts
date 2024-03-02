@@ -1,6 +1,7 @@
 import { env } from 'node:process';
 import { setTimeout } from 'node:timers/promises';
-import { EmbedType, type Task, responseOptions } from '@j164/bot-framework';
+import { type Task } from '../bot-client.js';
+import { EmbedType, responseOptions } from '../util/response-helpers.js';
 
 // TODO: determine which properties are needed
 type Laundry = {
