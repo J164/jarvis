@@ -7,7 +7,7 @@
     "node": ">=20.11.0"
   },
   "dependencies": {
-    "discord.js": "14.14.1",
+    "discord.js": "14.15.2",
     "mongodb": "6.4.0",
     "node-cron": "3.0.3",
     "pino": "8.19.0"
