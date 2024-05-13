@@ -73,8 +73,13 @@ export async function sendPaginatedMessage(
 	options: { selectable?: boolean } = {},
 	messageOptions: BaseMessageOptions = {},
 ): Promise<string[] | undefined> {
-	messageOptions.embeds ??= [];
-	messageOptions.embeds.push(embed);
+	const embeds = [];
+	if (messageOptions.embeds) {
+		embeds.push(...messageOptions.embeds);
+	}
+
+	embeds.push(embed);
+	messageOptions.embeds = embeds;
 
 	const { fields } = embed;
 	const singlePage = !fields || fields.length <= 25;
@@ -87,7 +92,7 @@ export async function sendPaginatedMessage(
 	const initialFields = fields?.slice(0, 24) ?? [];
 	embed.fields = initialFields;
 
-	messageOptions.components = [
+	const components = [
 		{
 			type: ComponentType.ActionRow,
 			components: [
@@ -132,10 +137,10 @@ export async function sendPaginatedMessage(
 				},
 			],
 		} satisfies PaginationComponent,
-	];
+	] as Array<PaginationComponent | SelectComponent>;
 
 	if (options.selectable) {
-		messageOptions.components.push({
+		components.push({
 			type: ComponentType.ActionRow,
 			components: [
 				{
@@ -152,6 +157,8 @@ export async function sendPaginatedMessage(
 			],
 		} satisfies SelectComponent);
 	}
+
+	messageOptions.components = components;
 
 	return startPagination(await sendMessage(messageOptions), messageOptions as PaginatedMessageOptions, fields);
 }
